@@ -1,13 +1,14 @@
 #! /usr/bin/env python
 """Density Peak Advanced clustering algorithm, scikit-learn compatible."""
-
 import codecs
 import os
-#import numpy 
+import numpy
 
-from setuptools import find_packages, setup, Extension
-#from Cython.Build import cythonize
-#numpy_include_dir = numpy.get_include()
+from setuptools import find_packages
+from numpy.distutils.core import Extension, setup
+from Cython.Build import cythonize
+
+numpy_include_dir = numpy.get_include()
 
 # get __version__ from _version.py
 ver_file = os.path.join('Pipeline', '_version.py')
@@ -16,10 +17,13 @@ with open(ver_file) as f:
 
 DISTNAME = 'DPApipeline'
 DESCRIPTION = 'The Density Peak Advanced packages.'
+
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
+
 with open('requirements.txt') as f:
     INSTALL_REQUIRES = f.read().splitlines()
+
 LICENSE = 'new BSD'
 VERSION = __version__
 CLASSIFIERS = ['Intended Audience :: Science/Research',
@@ -56,25 +60,29 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('DPApipeline', parent_package, top_path)
     config.add_subpackage('DPA')
     return config
-"""
-EXTENSIONS = [
-    Extension('DPA._DPA', [os.path.join('DPA', '_DPA.pyx')], #'DPA/_DPA.pyx'],
-        #include_dirs=[numpy_include_dir,],
-        #define_macros=[('CYTHON_TRACE', '1' if debug else '0')],
-        extra_compile_args=['-O3'],
-        ),
-    Extension('DPA._PAk', ['DPA/_PAk.pyx'],
-        #include_dirs=[numpy_include_dir,],
-        #define_macros=[('CYTHON_TRACE', '1' if debug else '0')],
-        extra_compile_args=['-O3'],
-        ),
-     Extension(
-      name = 'NR', 
-      sources = [os.path.join('', 'NR.cpython-37m-darwin.so'), 
-            os.path.join('', 'NRmaxL.f90')])
 
-]
-"""
+EXTENSIONS = [
+    Extension(
+        name='Pipeline._DPA',
+        sources=['Pipeline/_DPA.pyx'],
+        include_dirs=[numpy_include_dir],
+        define_macros=[('CYTHON_TRACE', '1')],
+        extra_compile_args=['-O3'],
+        ),
+    Extension(
+        name='Pipeline._PAk',
+        sources=['Pipeline/_PAk.pyx'],
+        include_dirs=[numpy_include_dir],
+        define_macros=[('CYTHON_TRACE', '1')],
+        extra_compile_args=['-O3'],
+        ),
+    Extension(
+        name='Pipeline.NR',
+        sources=['Pipeline/NRmaxL.f90']
+    )
+    ]
+
+
 setup(name=DISTNAME,
       description=DESCRIPTION,
       author="Maria d'Errico",
@@ -85,6 +93,6 @@ setup(name=DISTNAME,
       classifiers=CLASSIFIERS,
       packages=find_packages(exclude=['notebooks']),
       install_requires=INSTALL_REQUIRES,
-      extras_require=EXTRAS_REQUIRE)
-      #ext_modules = cythonize(EXTENSIONS))
+      extras_require=EXTRAS_REQUIRE,
+      ext_modules=cythonize(EXTENSIONS))
       #**configuration(top_path='').todict())
